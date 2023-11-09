@@ -1,1 +1,4 @@
-This is the final project for comp bio and deep learning for UW CSE 543 and CSE 527
+# Difusion from brain scans
+
+## Code included in this repo from:
+- https://github.com/tknapen/nsd_access
