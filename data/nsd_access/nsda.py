@@ -1,11 +1,10 @@
-# Code from https://github.com/tknapen/nsd_access/tree/master
 import os
 import os.path as op
 import glob
 import nibabel as nb
 import numpy as np
 import pandas as pd
-from pandas.io.json import json_normalize
+from pandas import json_normalize
 from tqdm import tqdm
 import h5py
 import matplotlib.pyplot as plt
@@ -148,15 +147,25 @@ class NSDAccess(object):
                     data_folder, f'{hemi}.betas_session{si_str}.mgh')).get_data()
                 session_betas.append(hdata)
             out_data = np.squeeze(np.vstack(session_betas))
+            if len(trial_index) == 0:
+                trial_index = slice(0, out_data.shape[-1])
+
+            return out_data[..., trial_index]
+
         else:
             # if no mask was specified, we'll use the nifti image
-            out_data = nb.load(
-                op.join(data_folder, f'betas_session{si_str}.nii.gz')).get_data()
+            ipf = op.join(data_folder, f'betas_session{si_str}.hdf5')
+            h5 = h5py.File(ipf, 'r')
+            betas = h5.get('betas')
+            # out_data = nb.load(
+            #     op.join(data_folder, f'betas_session{si_str}.nii.gz')).get_data()
 
-        if len(trial_index) == 0:
-            trial_index = slice(0, out_data.shape[-1])
+            if len(trial_index) == 0:
+                # trial_index = slice(0, out_data.shape[-1])
+                trial_index = slice(0, betas.shape[0])
 
-        return out_data[..., trial_index]
+            return betas[trial_index,:]
+
 
     def read_mapper_results(self, subject, mapper='prf', data_type='angle', data_format='fsaverage'):
         """read_mapper_results [summary]
@@ -241,7 +250,7 @@ class NSDAccess(object):
         else:  # is 'func1pt8mm', 'MNI', or 'func1mm'
             ipf = op.join(self.ppdata_folder, subject,
                           data_format, 'roi', f'{atlas}.nii.gz')
-            return nb.load(ipf).get_data(), atlas_mapping
+            return nb.load(ipf).get_fdata(), atlas_mapping
 
     def list_atlases(self, subject, data_format='fsaverage', abs_paths=False):
         """list_atlases [summary]
@@ -384,7 +393,7 @@ class NSDAccess(object):
                 info_type, subj_info['cocoSplit'])
             print('getting annotations from ' + annot_file)
             if not os.path.isfile(annot_file):
-                print('annotations file not found')
+#                 print('annotations file not found')
                 self.download_coco_annotation_file()
 
             coco = COCO(annot_file)
