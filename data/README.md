@@ -11,7 +11,7 @@ aws configure
 ```
 
 ## Run these commands to download the data
-Be sure to remove the --dryrun flag to actually download all of the data.
+Be sure to remove the --dryrun flag to actually download all of the data. You will get a lot of access denied which is totally fine (some of the files are not yet released).
 **Be sure to run this inside the data folder.**
 
 ### Download the nsd_data folder
