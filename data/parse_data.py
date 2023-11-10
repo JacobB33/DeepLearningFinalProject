@@ -40,6 +40,11 @@ def setup_dirs(processed_data_path: str) -> None:
         os.mkdir(os.path.join(processed_data_path, "embeddings"))
     if not os.path.exists(os.path.join(processed_data_path, "betas")):
         os.mkdir(os.path.join(processed_data_path, "betas"))
+        
+    for i in range(1, 38):
+        if not os.path.exists(os.path.join(processed_data_path, "betas", f"ses_{i}")):
+            os.mkdir(os.path.join(processed_data_path, "betas", f"ses_{i}"))
+
 
 
 def main(subject, processed_data_path="data/processed_data/"):
@@ -66,34 +71,36 @@ def main(subject, processed_data_path="data/processed_data/"):
     trial_number = 0
     for i in tqdm.tqdm(range(1, 38)):
         betas = nsd.read_betas("subj01", session_index=i)
-        for index in range(len(betas)):
-            beta = betas[
-                index
-            ]  # numpy array of length 750 which is the voxels of brain activity
+        coco_annotations = nsd.read_image_coco_info(stimulus[trial_number:trial_number + len(betas)])
+        for beta_idx in range(len(betas)):
+            
+            # numpy array of length 750 which is the voxels of brain activity
+            beta = betas[beta_idx]  
+            
             image_id = int(stimulus[trial_number])
             if not image_id in dataset["images"]:
-                coco_info = nsd.read_image_coco_info([image_id])
+                coco_info = coco_annotations[beta_idx]
                 captions = [info["caption"] for info in coco_info]
                 embeddings = get_text_embeddings(captions, embedding_model)
                 image_to_embedding_list = []
-                for i in range(len(embeddings)):
+                for k in range(len(embeddings)):
                     save_path = os.path.join(
                         processed_data_path,
                         "embeddings",
-                        f"img{image_id}_caption_{i}.npy",
+                        f"img{image_id}_caption_{k}.npy",
                     )
-                    np.save(save_path, embeddings[i])
+                    np.save(save_path, embeddings[k])
                     image_to_embedding_list.append(
-                        {"caption": captions[i], "embedding_path": save_path}
+                        {"cap": captions[i], "embd": save_path}
                     )
                 dataset["images"][image_id] = image_to_embedding_list
 
             beta_path = os.path.join(
-                processed_data_path, "betas", f"trial_{trial_number}.npy"
+                processed_data_path, f"betas/ses_{i}", f"trial_{trial_number}.npy"
             )
             np.save(beta_path, beta)
             dataset["annotations"].append(
-                {"trial": trial_number, "image": image_id, "beta_path": beta_path}
+                {"trial": trial_number, "img": image_id, "beta": beta_path}
             )
             trial_number += 1
 
