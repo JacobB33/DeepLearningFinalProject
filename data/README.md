@@ -2,13 +2,24 @@
 The data is processed into a dictionary object that is of the following form:
 ```python
 {
-    annotations: List[
+    "annotations": List[
         {
-            
+            trial: int, # Trial number
+            image: int, # Image Number
+            beta_path: str, # Path to the beta file
         }
-    ]
+    ] # List of annotations, from trial 0 to the end
 
-
+    "images": {
+        image_num: { # The image number (integer)
+            [
+                {
+                    "caption": str, # A caption for the image
+                    "embedding_path": str, # Path to the embedding file 
+                }
+            ]
+        }
+    }
 }
 
 ```
