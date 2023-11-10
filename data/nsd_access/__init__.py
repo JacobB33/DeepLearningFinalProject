@@ -1,1 +1,1 @@
-from nsda import *
+from .nsda import *

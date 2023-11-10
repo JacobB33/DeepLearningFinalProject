@@ -9,7 +9,7 @@ from tqdm import tqdm
 import h5py
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-
+import scipy.io
 import urllib.request
 import zipfile
 from pycocotools.coco import COCO
@@ -97,7 +97,7 @@ class NSDAccess(object):
         full_path = full_path.format(subject=subject,
                                      data_format=data_format,
                                      filename=filename)
-        return nb.load(full_path).get_data()
+        return nb.load(full_path).get_fdata()
 
     def read_betas(self, subject, session_index, trial_index=[], data_type='betas_fithrf_GLMdenoise_RR', data_format='fsaverage', mask=None):
         """read_betas read betas from MRI files
@@ -144,7 +144,7 @@ class NSDAccess(object):
             session_betas = []
             for hemi in ['lh', 'rh']:
                 hdata = nb.load(op.join(
-                    data_folder, f'{hemi}.betas_session{si_str}.mgh')).get_data()
+                    data_folder, f'{hemi}.betas_session{si_str}.mgh')).get_fdata()
                 session_betas.append(hdata)
             out_data = np.squeeze(np.vstack(session_betas))
             if len(trial_index) == 0:
@@ -158,7 +158,7 @@ class NSDAccess(object):
             h5 = h5py.File(ipf, 'r')
             betas = h5.get('betas')
             # out_data = nb.load(
-            #     op.join(data_folder, f'betas_session{si_str}.nii.gz')).get_data()
+            #     op.join(data_folder, f'betas_session{si_str}.nii.gz')).get_fdata()
 
             if len(trial_index) == 0:
                 # trial_index = slice(0, out_data.shape[-1])
@@ -238,12 +238,12 @@ class NSDAccess(object):
             if atlas[:3] in ('rh.', 'lh.'):  # check if hemisphere-specific atlas requested
                 ipf = op.join(self.nsddata_folder, 'freesurfer',
                               subject, 'label', f'{atlas}.mgz')
-                return np.squeeze(nb.load(ipf).get_data()), atlas_mapping
+                return np.squeeze(nb.load(ipf).get_fdata()), atlas_mapping
             else:  # more than one hemisphere requested
                 session_betas = []
                 for hemi in ['lh', 'rh']:
                     hdata = nb.load(op.join(
-                        self.nsddata_folder, 'freesurfer', subject, 'label', f'{hemi}.{atlas}.mgz')).get_data()
+                        self.nsddata_folder, 'freesurfer', subject, 'label', f'{hemi}.{atlas}.mgz')).get_fdata()
                     session_betas.append(hdata)
                 out_data = np.squeeze(np.vstack(session_betas))
                 return out_data, atlas_mapping
@@ -530,3 +530,9 @@ class NSDAccess(object):
                             image_cat.append(this_cat)
                 coco_cats.append(image_cat)
         return coco_cats
+    
+if __name__ == "__main__":
+    x = NSDAccess('data/nsd')
+    # x.download_coco_annotation_file()
+    y = x.read_betas('subj01', 1)
+    print('here')
