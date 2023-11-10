@@ -26,24 +26,6 @@ def main(subject, processed_data_path='data/processed_data/'):
 
         stim_index += len(betas)
 
-        
-            
-        
-    
-    # nsd.read_image_coco_info([-1], show_annot=True, show_img=True)
-    # # of length 72_999
-    # x = nsd.stim_descriptions.iloc
-    print(stimulus)
-    print('H')
-    
-    
-    
-    
-    
-    # nsd_expdesign = scipy.io.loadmat('data/nsd/nsddata/experiments/nsd/nsd_expdesign.mat')
-    # sharedix = nsd_expdesign['sharedix'] -1 
-    # print(sharedix.shape)
-    
     
 if __name__ == '__main__':
     main('subj01')
