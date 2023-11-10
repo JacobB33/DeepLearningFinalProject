@@ -1,1 +1,4 @@
 data/nsd
+*.pyc
+*.pyo
+*.log

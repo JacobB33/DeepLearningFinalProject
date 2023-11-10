@@ -1,3 +1,19 @@
+# Instructions to process the data
+The data is processed into a dictionary object that is of the following form:
+```python
+{
+    annotations: List[
+        {
+            
+        }
+    ]
+
+
+}
+
+```
+
+
 # Instructions to download the data
 
 For this project, we need to have the aws cli installed. In order to do this run:
