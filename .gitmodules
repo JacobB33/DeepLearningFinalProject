@@ -1,4 +1,0 @@
-[submodule "StableDiffusionFork"]
-	path = StableDiffusionFork
-	url = https://github.com/JacobB33/StableDiffusionFork.git
-	branch = main
