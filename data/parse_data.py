@@ -56,30 +56,42 @@ def main(subject, processed_data_path="data/processed_data/"):
     nsd = NSDAccess("data/nsd/")
 
     subject_behaviors = pd.DataFrame()
-    for i in range(1, 38):
+    for session_num in range(1, 38):
+        # print(len(subject_behaviors))
         subject_behaviors = pd.concat(
-            [subject_behaviors, nsd.read_behavior(subject, i)]
+            [subject_behaviors, nsd.read_behavior(subject, session_num)]
         )
-
+    
     # This is the data structure that we will be saving to a file. See the readme for more information
     dataset = {"annotations": [], "images": {}}
 
     # It is 1 indexed I think. It has a value of 73000, even though we have the max index of stim_discriptions is 72999
     # These can be used with nsd.read_image_coco_info to get the image information
     stimulus = subject_behaviors["73KID"] - 1
+    stimulus = stimulus.to_numpy()
 
-    trial_number = 0
-    for i in tqdm.tqdm(range(1, 38)):
-        betas = nsd.read_betas("subj01", session_index=i)
-        coco_annotations = nsd.read_image_coco_info(stimulus[trial_number:trial_number + len(betas)])
-        for beta_idx in range(len(betas)):
+    
+    for session_num in tqdm.tqdm(range(1, 38), colour='blue'):
+        betas = nsd.read_betas("subj01", session_index=session_num, data_type="betas_fithrf_GLMdenoise_RR", data_format='func1pt8mm')
+        mask, atlas_dict = nsd.read_atlas_results('subj01', 'streams', data_format='func1pt8mm')
+        ventral_mask = mask.transpose([2, 1, 0]) == atlas_dict['ventral']
+        ventral_betas = betas[:, ventral_mask]
+        trial_stimulus = stimulus[(session_num-1)*750:(session_num)*750]
+        coco_annotations = nsd.read_image_coco_info(trial_stimulus)
+        
+        for trial_number in tqdm.tqdm(range(len(betas)), colour='green'):
             
-            # numpy array of length 750 which is the voxels of brain activity
-            beta = betas[beta_idx]  
+            # numpy array of length 7604 which is the voxels of brain activity
+            ventral_beta = ventral_betas[trial_number]
+            assert len(ventral_beta) == 7604
             
-            image_id = int(stimulus[trial_number])
+            
+            image_id = int(trial_stimulus[trial_number])
+            
             if not image_id in dataset["images"]:
-                coco_info = coco_annotations[beta_idx]
+                # we have not embedded this image yet
+                
+                coco_info = coco_annotations[trial_number]
                 captions = [info["caption"] for info in coco_info]
                 embeddings = get_text_embeddings(captions, embedding_model)
                 image_to_embedding_list = []
@@ -91,21 +103,26 @@ def main(subject, processed_data_path="data/processed_data/"):
                     )
                     np.save(save_path, embeddings[k])
                     image_to_embedding_list.append(
-                        {"cap": captions[i], "embd": save_path}
+                        {"cap": captions[k], "embd": save_path}
                     )
+                    
                 dataset["images"][image_id] = image_to_embedding_list
 
             beta_path = os.path.join(
-                processed_data_path, f"betas/ses_{i}", f"trial_{trial_number}.npy"
+                processed_data_path, f"betas/ses_{session_num}", f"trial_{trial_number}.npy"
             )
-            np.save(beta_path, beta)
+            np.save(beta_path, ventral_beta)
             dataset["annotations"].append(
-                {"trial": trial_number, "img": image_id, "beta": beta_path}
+                {"session_number": session_num, "trial": trial_number, "img": image_id, "beta": beta_path}
             )
-            trial_number += 1
 
-    json.dump(dataset, open(f"{processed_data_path}/dataset.json", "w"))
+    
+        json.dump(dataset, open(f"{processed_data_path}/dataset.json", "w"))
 
 
 if __name__ == "__main__":
+    # nsd = NSDAccess("data/nsd/")
+    # print(nsd.read_betas('subj01', 1, data_type='betas_fithrf_GLMdenoise_RR', data_format='func1pt8mm').shape)
+    
+    # print(nsd.read_betas('subj01', 1, [1], data_type='betas_fithrf_GLMdenoise_RR', data_format='func1pt8mm').shape)
     main("subj01")

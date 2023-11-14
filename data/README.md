@@ -4,9 +4,10 @@ The data is processed into a dictionary object that is of the following form:
 {
     "annotations": List[
         {
+            session_number: int, # Session number
             trial: int, # Trial number
             image: int, # Image Number
-            beta_path: str, # Path to the beta file
+            beta: str, # Path to the beta file
         }
     ] # List of annotations, from trial 0 to the end
 
@@ -14,8 +15,8 @@ The data is processed into a dictionary object that is of the following form:
         image_num: { # The image number (integer)
             [
                 {
-                    "caption": str, # A caption for the image
-                    "embedding_path": str, # Path to the embedding file 
+                    "cap": str, # A caption for the image
+                    "embd": str, # Path to the embedding file 
                 }
             ]
         }
