@@ -31,6 +31,7 @@ The data is processed into a dictionary object that is of the following form:
 ```
 The processed image caption embeddings are stored to the folder ``./data/processed_data/embeddings`` and the betas of the ventral lobe (a numpy array of length 7604) is stored in the folder ``./data/processed_data/betas/session_i/trial_j``. The json described above is saved at ``./data/processed_data/annotations.json``
 
+You can find a current version of the processed data at [the following location](https://drive.google.com/file/d/1Xg_1bnFIiKy8jeAUI3qxJ_Ph9dxlaBfs/view?usp=sharing)
 # Instructions to download the data
 
 For this project, we need to have the aws cli installed. In order to do this run:
