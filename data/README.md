@@ -1,4 +1,9 @@
 # Instructions to process the data
+run the following command:
+```bash
+python process_data.py
+```
+This assumes that the folder structure of the nsd dataset is located at ``./data/nsd``
 The data is processed into a dictionary object that is of the following form:
 ```python
 {
@@ -24,7 +29,7 @@ The data is processed into a dictionary object that is of the following form:
 }
 
 ```
-
+The processed image caption embeddings are stored to the folder ``./data/processed_data/embeddings`` and the betas of the ventral lobe (a numpy array of length 7604) is stored in the folder ``./data/processed_data/betas/session_i/trial_j``. The json described above is saved at ``./data/processed_data/annotations.json``
 
 # Instructions to download the data
 
