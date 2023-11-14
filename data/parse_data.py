@@ -8,6 +8,8 @@ from StableDiffusionFork.ldm.modules.encoders.modules import FrozenOpenCLIPEmbed
 import os
 import json
 import tqdm
+import cv2
+
 
 @torch.no_grad()
 def get_text_embeddings(
@@ -40,11 +42,12 @@ def setup_dirs(processed_data_path: str) -> None:
         os.mkdir(os.path.join(processed_data_path, "embeddings"))
     if not os.path.exists(os.path.join(processed_data_path, "betas")):
         os.mkdir(os.path.join(processed_data_path, "betas"))
-        
+    if not os.path.exists(os.path.join(processed_data_path, "images")):
+        os.mkdir(os.path.join(processed_data_path, "images"))
+
     for i in range(1, 38):
         if not os.path.exists(os.path.join(processed_data_path, "betas", f"ses_{i}")):
             os.mkdir(os.path.join(processed_data_path, "betas", f"ses_{i}"))
-
 
 
 def main(subject, processed_data_path="data/processed_data/"):
@@ -61,7 +64,7 @@ def main(subject, processed_data_path="data/processed_data/"):
         subject_behaviors = pd.concat(
             [subject_behaviors, nsd.read_behavior(subject, session_num)]
         )
-    
+
     # This is the data structure that we will be saving to a file. See the readme for more information
     dataset = {"annotations": [], "images": {}}
 
@@ -70,29 +73,38 @@ def main(subject, processed_data_path="data/processed_data/"):
     stimulus = subject_behaviors["73KID"] - 1
     stimulus = stimulus.to_numpy()
 
-    
-    for session_num in tqdm.tqdm(range(1, 38), colour='blue'):
-        betas = nsd.read_betas("subj01", session_index=session_num, data_type="betas_fithrf_GLMdenoise_RR", data_format='func1pt8mm')
-        mask, atlas_dict = nsd.read_atlas_results('subj01', 'streams', data_format='func1pt8mm')
-        ventral_mask = mask.transpose([2, 1, 0]) == atlas_dict['ventral']
+    for session_num in tqdm.tqdm(range(1, 38), colour="blue"):
+        betas = nsd.read_betas(
+            "subj01",
+            session_index=session_num,
+            data_type="betas_fithrf_GLMdenoise_RR",
+            data_format="func1pt8mm",
+        )
+        mask, atlas_dict = nsd.read_atlas_results(
+            "subj01", "streams", data_format="func1pt8mm"
+        )
+        ventral_mask = mask.transpose([2, 1, 0]) == atlas_dict["ventral"]
         ventral_betas = betas[:, ventral_mask]
-        trial_stimulus = stimulus[(session_num-1)*750:(session_num)*750]
+        trial_stimulus = stimulus[(session_num - 1) * 750 : (session_num) * 750]
         coco_annotations = nsd.read_image_coco_info(trial_stimulus)
-        
-        for trial_number in tqdm.tqdm(range(len(betas)), colour='green'):
-            
+
+        for trial_number in tqdm.tqdm(range(len(betas)), colour="green"):
             # numpy array of length 7604 which is the voxels of brain activity
             ventral_beta = ventral_betas[trial_number]
             assert len(ventral_beta) == 7604
-            
-            
+
             image_id = int(trial_stimulus[trial_number])
-            
+
             if not image_id in dataset["images"]:
                 # we have not embedded this image yet
-                
+
                 coco_info = coco_annotations[trial_number]
                 captions = [info["caption"] for info in coco_info]
+                img = cv2.cvtColor(nsd.read_images((image_id)), cv2.COLOR_RGB2BGR)
+                img_file = os.path.join(
+                    processed_data_path, "images", f"img{image_id}.jpg"
+                )
+                cv2.imwrite(img_file, img)
                 embeddings = get_text_embeddings(captions, embedding_model)
                 image_to_embedding_list = []
                 for k in range(len(embeddings)):
@@ -105,24 +117,33 @@ def main(subject, processed_data_path="data/processed_data/"):
                     image_to_embedding_list.append(
                         {"cap": captions[k], "embd": save_path}
                     )
-                    
-                dataset["images"][image_id] = image_to_embedding_list
+
+                dataset["images"][image_id] = {
+                    "im_path": img_file,
+                    "captions": image_to_embedding_list,
+                }
 
             beta_path = os.path.join(
-                processed_data_path, f"betas/ses_{session_num}", f"trial_{trial_number}.npy"
+                processed_data_path,
+                f"betas/ses_{session_num}",
+                f"trial_{trial_number}.npy",
             )
             np.save(beta_path, ventral_beta)
             dataset["annotations"].append(
-                {"session_number": session_num, "trial": trial_number, "img": image_id, "beta": beta_path}
+                {
+                    "session_number": session_num,
+                    "trial": trial_number,
+                    "img": image_id,
+                    "beta": beta_path,
+                }
             )
 
-    
         json.dump(dataset, open(f"{processed_data_path}/dataset.json", "w"))
 
 
 if __name__ == "__main__":
     # nsd = NSDAccess("data/nsd/")
     # print(nsd.read_betas('subj01', 1, data_type='betas_fithrf_GLMdenoise_RR', data_format='func1pt8mm').shape)
-    
+
     # print(nsd.read_betas('subj01', 1, [1], data_type='betas_fithrf_GLMdenoise_RR', data_format='func1pt8mm').shape)
     main("subj01")

@@ -4,3 +4,5 @@ data/processed_data
 *.pyc
 *.pyo
 *.log
+__pycache__/
+*.zip
