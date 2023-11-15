@@ -5,20 +5,21 @@ python process_data.py
 ```
 This assumes that the folder structure of the nsd dataset is located at ``./data/nsd``
 The data is processed into a dictionary object that is of the following form:
+
 ```python
 {
     "annotations": List[
         {
-            session_number: int, # Session number
-            trial: int, # Trial number
-            image: int, # Image Number
-            beta: str, # Path to the beta file
+            "session_number": int, # Session number
+            "trial": int, # Trial number
+            "img": int, # Image Number
+            "beta": str, # Path to the beta file
         }
     ] # List of annotations, from trial 0 to the end
 
     "images": {
-        image_num: { # The image number (integer)
-            "image": str, # Path to the image file
+        "image_num": { # The image number (integer)
+            "im_path": str, # Path to the image file
             "captions": [
                     {
                         "cap": str, # A caption for the image
