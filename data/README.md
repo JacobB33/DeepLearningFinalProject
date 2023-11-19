@@ -3,7 +3,7 @@ run the following command:
 ```bash
 python process_data.py
 ```
-This assumes that the folder structure of the nsd dataset is located at ``./data/nsd``
+This assumes that the folder structure of the nsd dataset is located at`.`/data/nsd``
 The data is processed into a dictionary object that is of the following form:
 
 ```python
@@ -31,9 +31,17 @@ The data is processed into a dictionary object that is of the following form:
 }
 
 ```
-The processed image caption embeddings are stored to the folder ``./data/processed_data/embeddings`` and the betas of the ventral lobe (a numpy array of length 7604) is stored in the folder ``./data/processed_data/betas/session_i/trial_j``. The json described above is saved at ``./data/processed_data/annotations.json``. The image files are saved to ``./data/processed_data/images``. The processed data is not included in the repository due to its size.
+The processed image caption embeddings are stored in the folder ``./data/processed_data/embeddings`` and the betas of the ventral lobe (a numpy array of length 7604) is stored in the folder ``./data/processed_data/betas/session_i/trial_j``. The json described above is saved at ``./data/processed_data/annotations.json``. The image files are saved to ``./data/processed_data/images``. The processed data is not included in the repository due to its size.
 
-You can find a current version of the processed data at [the following location](https://drive.google.com/file/d/1Xg_1bnFIiKy8jeAUI3qxJ_Ph9dxlaBfs/view?usp=sharing)
+## Already Processed Data
+You can find a current version of the processed data at [the following location](https://drive.google.com/file/d/1lLWr0C8mjgnUq0lFIUmEKUqjsh7jzI6D/view?usp=drive_link). Use the following command to download it:
+```bash
+sudo apt install gdown
+gdown https://drive.google.com/file/d/1lLWr0C8mjgnUq0lFIUmEKUqjsh7jzI6D/view?usp=drive_link
+```
+Then unzip it:
+```bash
+```
 # Instructions to download the data
 
 For this project, we need to have the aws cli installed. In order to do this run:

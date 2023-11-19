@@ -1,0 +1,17 @@
+trainer_config:
+  max_epochs: 10
+  batch_size: 216
+  data_loader_workers: 4
+  grad_norm_clip: 1.0
+  snapshot_path: encoder_config.pt
+  save_every: 3
+  use_amp: True
+  use_wandb: True
+optimizer_config:
+  weight_decay: 0.1
+  learning_rate: 0.0003
+encoder_config:
+  upscale_schedule: [8, 16, 32, 64, 74]
+hydra:
+  run:
+    dir: ./
