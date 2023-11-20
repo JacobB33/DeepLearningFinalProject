@@ -27,6 +27,10 @@ class OptimizerConfig:
     learning_rate: float = None
     weight_decay: float = None
 
+@dataclass
+class DataConfig:
+    test: bool
+
 def create_optimizer(model, config: OptimizerConfig):
     if config.optimizer == "adam":
         return torch.optim.Adam(model.parameters(), lr=config.learning_rate, weight_decay=config.weight_decay)
@@ -34,4 +38,5 @@ def create_optimizer(model, config: OptimizerConfig):
         return torch.optim.SGD(model.parameters(), lr=config.learning_rate, weight_decay=config.weight_decay)
     else:
         raise ValueError(f"Optimizer {config.optimizer} not supported")
+
 
