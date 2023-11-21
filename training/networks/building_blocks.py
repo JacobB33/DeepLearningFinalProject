@@ -66,9 +66,9 @@ class EncodeBS(nn.Module):
 
 
 if __name__ == "__main__":  
-    input = torch.randn(1, 7604)
+    test_tensor = torch.randn(1, 7604)
     encoder = EncodeBS()
-    output = encoder(input)
+    output = encoder(test_tensor)
     print(output.shape)
     block = ResBlock(8)
     output = block(output)
@@ -76,5 +76,5 @@ if __name__ == "__main__":
     print(output.shape) 
     
     upscale = DoubleConv(8, 16)
-    print(upscale(output).shape)u
+    print(upscale(output).shape)
     
