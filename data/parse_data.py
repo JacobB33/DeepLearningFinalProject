@@ -115,11 +115,11 @@ def main(subject, processed_data_path="data/processed_data/"):
                     )
                     np.save(save_path, embeddings[k])
                     image_to_embedding_list.append(
-                        {"cap": captions[k], "embd": save_path}
+                        {"cap": captions[k], "embd": save_path.replace(processed_data_path, '')}
                     )
 
                 dataset["images"][image_id] = {
-                    "im_path": img_file,
+                    "im_path": img_file.replace(processed_data_path, ''),
                     "captions": image_to_embedding_list,
                 }
 
@@ -134,7 +134,7 @@ def main(subject, processed_data_path="data/processed_data/"):
                     "session_number": session_num,
                     "trial": trial_number,
                     "img": image_id,
-                    "beta": beta_path,
+                    "beta": beta_path.replace(processed_data_path, ''),
                 }
             )
 

@@ -26,13 +26,67 @@ def get_train_test_dataset(train_percentage, processed_data_path='./data/process
 
 
 class NSDDataset(Dataset):
+    def __init__(self, processed_data_path='./data/processed_data', load_into_memory=True, with_images=False):
+        assert load_into_memory
+        assert not with_images
+        dataset_json = json.load(open(f"{processed_data_path}/dataset.json", "r"))
+        self.load_into_memory = load_into_memory
+        self.with_images = with_images
+        self.processed_data_path = processed_data_path
+        # self.process
+
+        annotations = dataset_json["annotations"]
+
+        self.data_size = len(annotations)
+
+        self.dataset = []
+        self.image_embeddings = {}
+        for annotation in annotations:
+            beta = np.load(os.path.join(processed_data_path, annotation["beta"]))
+            image_num = str(annotation["img"])
+
+            if image_num not in self.image_embeddings:
+                image_info = dataset_json["images"][image_num]
+                captions = image_info["captions"]
+                embeddings = []
+                for capt_dict in captions:
+                    embedding = np.load(os.path.join(processed_data_path, capt_dict["embd"]))
+                    embeddings.append(torch.from_numpy(embedding))
+                if not self.with_images:
+                    # print(embeddings[0].shape)
+                    self.image_embeddings[image_num] = torch.stack(embeddings)
+                    if not len(self.image_embeddings[image_num]) == 5:
+                        print(captions)
+                        exit()
+                    # print(self.image_embeddings[image_num].shape)
+
+                # else:
+                #     self.image_embeddings[image_num] = (
+                #         embeddings, Image.open(os.path.join(processed_data_path, image_info['im_path'])))
+
+            self.dataset.append((torch.from_numpy(beta), image_num))
+
+    def __getitem__(self, idx):
+        if self.load_into_memory:
+            beta, image_num = self.dataset[idx]
+            image_data = self.image_embeddings[image_num]
+            return beta, image_data
+
+        assert False
+
+    def __len__(self):
+        return self.data_size
+
+
+class NSDDatasetNonMemory(Dataset):
     def __init__(self, processed_data_path='./data/processed_data', load_into_memory=True, with_images=False, start=-1,
                  stop=-1):
         dataset_json = json.load(open(f"{processed_data_path}/dataset.json", "r"))
         self.load_into_memory = load_into_memory
         self.with_images = with_images
+        self.processed_data_path = processed_data_path
         # self.process
-
+        self.dataset_json = dataset_json
         if start == -1:
             annotations = dataset_json["annotations"]
         else:
@@ -44,41 +98,41 @@ class NSDDataset(Dataset):
 
         self.dataset = []
         for annotation in annotations:
-            print(annotation)
-            beta = np.load(annotation["beta"])
-            image_num = annotation["img"]
+            beta = np.load(os.path.join(processed_data_path, annotation["beta"]))
+            image_num = str(annotation["img"])
             image_info = dataset_json["images"][image_num]
             captions = image_info["captions"]
             embeddings = []
             for capt_dict in captions:
-                embedding = np.load(capt_dict["embd"])
+                embedding = np.load(os.path.join(processed_data_path, capt_dict["embd"]))
                 embeddings.append(embedding)
             if not self.with_images:
                 self.dataset.append((beta, embeddings))
             else:
                 image_path = image_info["im_path"]
-                self.dataset.append((beta, embeddings, Image.open(image_path)))
+                self.dataset.append((beta, embeddings, Image.open(os.path.join(processed_data_path, image_path))))
 
     def __getitem__(self, idx):
         if self.load_into_memory:
             return self.dataset[idx]
 
-        beta = np.load(self.annotations[idx]["beta"])
+        beta = np.load(os.path.join(self.processed_data_path, self.annotations[idx]["beta"]))
         image_num = self.annotations[idx]["image"]
         image_info = self.dataset_json["images"][image_num]
         captions = image_info["captions"]
         embeddings = []
         for capt_dict in captions:
-            embedding = np.load(capt_dict["embd"])
+            embedding = np.load(os.path.join(self.processed_data_path, capt_dict["embd"]))
             embeddings.append(embedding)
         if not self.with_images:
             return beta, embeddings
         else:
             image_path = image_info["im_path"]
-            return beta, embeddings, Image.open(image_path)
+            return beta, embeddings, Image.open(os.path.join(self.processed_data_path, image_path))
 
     def __len__(self):
         return self.data_size
+
 
 if __name__ == "__main__":
     test = NSDDataset(processed_data_path="/home/jacob/projects/DeepLearningFinalProject/data/processed_data")

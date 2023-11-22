@@ -8,13 +8,11 @@ trainer_config:
   use_amp: True
   use_wandb: True
 optimizer_config:
+  optimizer: adam
   weight_decay: 0.1
   learning_rate: 0.0003
 data_config:
   train_percentage: 1.0
 model_config:
   upscale_schedule: [8, 16, 32, 64, 74]
-hydra:
-  run:
-    dir: ./
 compile: True

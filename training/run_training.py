@@ -17,7 +17,7 @@ def ddp_setup():
 
 def get_train_objs(model_config: ModelConfig, opt_cfg: OptimizerConfig, data_cfg: DataConfig, compile: bool):
     dataset = get_train_dataset()
-    train_len = int(len(dataset) * data_cfg.train_percent)
+    train_len = int(len(dataset) * data_cfg.train_percentage)
     train_set, test_set = random_split(dataset, [train_len, len(dataset) - train_len])
     model = BrainScanEmbedder(model_config)
     optimizer = create_optimizer(model, opt_cfg)

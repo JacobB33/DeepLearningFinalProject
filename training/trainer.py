@@ -104,6 +104,7 @@ class Trainer:
         losses = []
         for iter, (source, targets) in enumerate(dataloader):
             step_type = "Train" if train else "Eval"
+            # import IPython; IPython.embed()
             source = source.to(self.local_rank)
             targets = targets.to(self.local_rank)
             batch_loss = self._run_batch(source, targets, train)
@@ -140,7 +141,7 @@ class Trainer:
                 dist.reduce(test_loss, 0, dist.ReduceOp.SUM)
             if self.global_rank == 0:
                 if self.test_loader:
-                    test_loss  = test_loss / self.world_size
+                    test_loss = test_loss / self.world_size
                     wandb.log({"loss": batch_avg_loss, "test_loss": test_loss.item()})
                 else:
                     wandb.log({"loss": batch_avg_loss})

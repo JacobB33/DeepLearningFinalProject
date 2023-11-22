@@ -4,7 +4,7 @@ run the following command:
 python process_data.py
 ```
 This assumes that the folder structure of the nsd dataset is located at`.`/data/nsd``
-The data is processed into a dictionary object that is of the following form:
+The data is processed into a dictionary object that is of the following form (paths are relative from the processed data root):
 
 ```python
 {
