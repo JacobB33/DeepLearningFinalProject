@@ -3,12 +3,15 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 import os
-from building_blocks import ResBlock, DoubleConv, EncodeBS
+from training.configs import ModelConfig
+from .building_blocks import ResBlock, DoubleConv, EncodeBS
 
 class BrainScanEmbedder(nn.Module):
     """This needs to be batched input of channel, brainscan or (c, 7604). Outputs (c, 77, 1024)"""
-    def __init__(self, upscale_schedule):
+    def __init__(self, model_config: ModelConfig):
         super().__init__()
+        upscale_schedule = ModelConfig.update_schedule
+
         self.encoder = EncodeBS(upscale_schedule[0])
         module = []
         

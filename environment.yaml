@@ -196,3 +196,4 @@ dependencies:
       - zipp==3.17.0
       - pycocotools==2.0.7
       - wandb
+      - hydra

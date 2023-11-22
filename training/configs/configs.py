@@ -1,6 +1,8 @@
 from dataclasses import dataclass
 from collections import OrderedDict
-from typing import Optional, Any, Dict
+from typing import Optional, Any, Dict, List
+import torch
+
 
 @dataclass
 class TrainerConfig:
@@ -15,21 +17,30 @@ class TrainerConfig:
     save_every: int = None
     use_amp: bool = None
 
+
+@dataclass
+class ModelConfig:
+    upscale_schedule: List[int]
+
+
 @dataclass
 class Snapshot:
     model_state: 'OrderedDict[str, torch.Tensor]'
     optimizer_state: Dict[str, Any]
     finished_epoch: int
-    
+
+
 @dataclass
 class OptimizerConfig:
     optimizer: str = None
     learning_rate: float = None
     weight_decay: float = None
 
+
 @dataclass
 class DataConfig:
-    test: bool
+    train_percentage: float
+
 
 def create_optimizer(model, config: OptimizerConfig):
     if config.optimizer == "adam":
@@ -38,5 +49,3 @@ def create_optimizer(model, config: OptimizerConfig):
         return torch.optim.SGD(model.parameters(), lr=config.learning_rate, weight_decay=config.weight_decay)
     else:
         raise ValueError(f"Optimizer {config.optimizer} not supported")
-
-
