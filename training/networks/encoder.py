@@ -4,7 +4,7 @@ import torch.nn.functional as F
 import numpy as np
 import os
 from training.configs import ModelConfig
-from .building_blocks import ResBlock, DoubleConv, EncodeBS
+from training.networks.building_blocks import ResBlock, DoubleConv, EncodeBS
 
 class BrainScanEmbedder(nn.Module):
     """This needs to be batched input of channel, brainscan or (c, 7604). Outputs (c, 77, 1024)"""
@@ -12,7 +12,7 @@ class BrainScanEmbedder(nn.Module):
         super().__init__()
         upscale_schedule = model_config.upscale_schedule
 
-        self.encoder = EncodeBS(upscale_schedule[0])
+        self.encoder = EncodeBS(num_output_channels=upscale_schedule[0])
         module = []
         
         for i in range(1, len(upscale_schedule)):
@@ -21,10 +21,11 @@ class BrainScanEmbedder(nn.Module):
         module.append(DoubleConv(upscale_schedule[-1], upscale_schedule[-1], activation=False))
         self.backbone = nn.Sequential(*module)
 
-    def forward(self, inputs, targets, caclulate_loss: True):
-        print(inputs, targets)
-        output = self.backbone(inputs)
-        print(output.shape)
-        exit()
-
+    def forward(self, source, targets, caclulate_loss = True):
+        output = self.encoder(source)
+        output = self.backbone(output)
+        if not caclulate_loss:
+            return output, None
+        loss = F.mse_loss(output, targets)
+        return output, loss
 

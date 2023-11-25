@@ -66,7 +66,7 @@ class EncodeBS(nn.Module):
 
 
 if __name__ == "__main__":  
-    test_tensor = torch.randn(1, 7604)
+    test_tensor = torch.randn(32, 7604)
     encoder = EncodeBS()
     output = encoder(test_tensor)
     print(output.shape)

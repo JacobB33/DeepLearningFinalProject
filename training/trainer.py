@@ -6,6 +6,7 @@ from dataclasses import asdict
 from collections import OrderedDict
 from typing import Optional, Any, Dict
 import os
+import wandb
 
 import torch
 from torch.utils.data import Dataset, DataLoader
@@ -48,10 +49,8 @@ class Trainer:
         self.model = DDP(self.model, device_ids=[self.local_rank])
 
         if trainer_config.use_wandb:
-            import wandb
             if self.global_rank == 0:
-                wandb.init(project="ddp-series")
-                wandb.log({"config": asdict(self.config)})
+                wandb.init(project="BrainScanEncoder", config=asdict(trainer_config))
 
 
     def _prepare_dataloader(self, dataset: Dataset):
@@ -81,7 +80,7 @@ class Trainer:
 
     def _run_batch(self, source, targets, train: bool = True) -> float:
         with torch.set_grad_enabled(train), torch.amp.autocast(device_type="cuda", dtype=torch.float16,
-                                                               enabled=(self.config.use_amp)):
+                                                               enabled=self.config.use_amp):
             _, loss = self.model(source, targets)
 
         if train:
@@ -104,7 +103,6 @@ class Trainer:
         losses = []
         for iter, (source, targets) in enumerate(dataloader):
             step_type = "Train" if train else "Eval"
-            # import IPython; IPython.embed()
             source = source.to(self.local_rank)
             targets = targets.to(self.local_rank)
             batch_loss = self._run_batch(source, targets, train)
@@ -137,7 +135,7 @@ class Trainer:
             # eval run
             if self.test_loader:
                 test_avg_loss = self._run_epoch(epoch, self.test_loader, train=False)
-                test_loss = torch.tensor([test_avg_loss])
+                test_loss = torch.tensor([test_avg_loss]).to(f'cuda:{self.local_rank}')
                 dist.reduce(test_loss, 0, dist.ReduceOp.SUM)
             if self.global_rank == 0:
                 if self.test_loader:

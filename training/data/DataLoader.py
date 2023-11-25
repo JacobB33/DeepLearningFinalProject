@@ -5,7 +5,7 @@ import os
 import sys
 import json
 from PIL import Image
-
+import random
 
 def get_train_dataset(processed_data_path='./data/processed_data', load_into_memory=True,
                       with_images=False):
@@ -42,7 +42,7 @@ class NSDDataset(Dataset):
         self.dataset = []
         self.image_embeddings = {}
         for annotation in annotations:
-            beta = np.load(os.path.join(processed_data_path, annotation["beta"]))
+            beta = np.load(os.path.join(processed_data_path, annotation["beta"])).astype(np.float32)
             image_num = str(annotation["img"])
 
             if image_num not in self.image_embeddings:
@@ -54,10 +54,10 @@ class NSDDataset(Dataset):
                     embeddings.append(torch.from_numpy(embedding))
                 if not self.with_images:
                     # print(embeddings[0].shape)
-                    self.image_embeddings[image_num] = torch.stack(embeddings)
-                    if not len(self.image_embeddings[image_num]) == 5:
-                        print(captions)
-                        exit()
+                    self.image_embeddings[image_num] = embeddings
+                    # if not len(self.image_embeddings[image_num]) == 5:
+                    #     print(captions)
+                    #     exit()
                     # print(self.image_embeddings[image_num].shape)
 
                 # else:
@@ -70,7 +70,7 @@ class NSDDataset(Dataset):
         if self.load_into_memory:
             beta, image_num = self.dataset[idx]
             image_data = self.image_embeddings[image_num]
-            return beta, image_data
+            return beta, random.choice(image_data)
 
         assert False
 
@@ -136,3 +136,4 @@ class NSDDatasetNonMemory(Dataset):
 
 if __name__ == "__main__":
     test = NSDDataset(processed_data_path="/home/jacob/projects/DeepLearningFinalProject/data/processed_data")
+    print('here')
