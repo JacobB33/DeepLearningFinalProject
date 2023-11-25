@@ -2,6 +2,7 @@ data/nsd
 data/processed_data_final
 data/processed_data_old
 data/processed_data
+wandb/
 *.pyc
 *.pyo
 *.log
