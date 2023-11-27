@@ -21,11 +21,11 @@ class BrainScanEmbedder(nn.Module):
         module.append(DoubleConv(upscale_schedule[-1], upscale_schedule[-1], activation=False))
         self.backbone = nn.Sequential(*module)
 
-    def forward(self, source, targets, caclulate_loss = True):
+    def forward(self, source, targets=None):
         output = self.encoder(source)
         output = self.backbone(output)
-        if not caclulate_loss:
-            return output, None
+        if targets is None:
+            return output
         loss = F.mse_loss(output, targets)
         return output, loss
 

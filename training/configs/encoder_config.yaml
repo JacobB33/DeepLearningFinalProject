@@ -3,14 +3,14 @@ trainer_config:
   batch_size: 1024
   data_loader_workers: 4
   grad_norm_clip: 1.0
-  snapshot_path: encoder_config.pt
+  snapshot_path: use_first_embbed.pt
   save_every: 3
   use_amp: True
   use_wandb: True
 optimizer_config:
   optimizer: adam
   weight_decay: 0.1
-  learning_rate: 0.0003
+  learning_rate: 0.0001
 data_config:
   train_percentage: 0.95
 model_config:

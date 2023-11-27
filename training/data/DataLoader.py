@@ -70,8 +70,7 @@ class NSDDataset(Dataset):
         if self.load_into_memory:
             beta, image_num = self.dataset[idx]
             image_data = self.image_embeddings[image_num]
-            return beta, random.choice(image_data)
-
+            return beta, image_data[0]
         assert False
 
     def __len__(self):

@@ -9,8 +9,9 @@ import torch
 from torch.utils.data import random_split
 from torch.distributed import init_process_group, destroy_process_group
 from training.data import get_train_dataset
-
-
+import random
+# import pickle
+# torchrun --nnodes 1 --nproc_per_node 1 ./training/run_training.py 
 def ddp_setup():
     init_process_group(backend="nccl")
     torch.cuda.set_device(int(os.environ["LOCAL_RANK"]))
@@ -18,10 +19,17 @@ def ddp_setup():
 def get_train_objs(model_config: ModelConfig, opt_cfg: OptimizerConfig, data_cfg: DataConfig, compile: bool):
     dataset = get_train_dataset()
     train_len = int(len(dataset) * data_cfg.train_percentage)
-    train_set, test_set = random_split(dataset, [train_len, len(dataset) - train_len])
+    indicies = list(range(len(dataset)))
+    random.shuffle(indicies)
+    train_idx, test_idx = indicies[:train_len], indicies[train_len:]
+    train_set = torch.utils.data.Subset(dataset, train_idx)
+    test_set = torch.utils.data.Subset(dataset, test_idx)
+    
+    # train_set, test_set = random_split(dataset, [train_len, len(dataset) - train_len])
+    
     model = BrainScanEmbedder(model_config)
     optimizer = create_optimizer(model, opt_cfg)
-    
+    print(test_idx)
     return model, optimizer, train_set, test_set
 
 def main(cfg_path):
