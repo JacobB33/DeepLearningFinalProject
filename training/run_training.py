@@ -50,4 +50,4 @@ def main(cfg_path):
 
 
 if __name__ == "__main__":
-    main('/home/jacob/projects/DeepLearningFinalProject/training/configs/encoder_config.yaml')
+    main('./training/configs/encoder_config.yaml')
