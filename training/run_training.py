@@ -16,7 +16,7 @@ def ddp_setup():
     init_process_group(backend="nccl")
     torch.cuda.set_device(int(os.environ["LOCAL_RANK"]))
 
-def get_train_objs(model_config: ModelConfig, opt_cfg: OptimizerConfig, data_cfg: DataConfig, compile: bool):
+def get_train_objs(model_config: ModelConfig, opt_cfg: OptimizerConfig, data_cfg: DataConfig, compile: bool, cfg):
     dataset = get_train_dataset()
     train_len = int(len(dataset) * data_cfg.train_percentage)
     indicies = list(range(len(dataset)))
@@ -24,7 +24,7 @@ def get_train_objs(model_config: ModelConfig, opt_cfg: OptimizerConfig, data_cfg
     train_idx, test_idx = indicies[:train_len], indicies[train_len:]
     train_set = torch.utils.data.Subset(dataset, train_idx)
     test_set = torch.utils.data.Subset(dataset, test_idx)
-    
+    cfg['test_idx'] = test_idx 
     # train_set, test_set = random_split(dataset, [train_len, len(dataset) - train_len])
     
     model = BrainScanEmbedder(model_config)
@@ -42,8 +42,8 @@ def main(cfg_path):
     data_config = DataConfig(**cfg['data_config'])
     trainer_config = TrainerConfig(**cfg['trainer_config'])
 
-    model, optimizer, train_data, test_data = get_train_objs(model_config, opt_config, data_config, cfg['compile'])
-    trainer = Trainer(trainer_config, model, optimizer, train_data, test_data)
+    model, optimizer, train_data, test_data = get_train_objs(model_config, opt_config, data_config, cfg['compile'], cfg)
+    trainer = Trainer(trainer_config, model, optimizer, train_data, test_data, cfg)
     trainer.train()
 
     destroy_process_group()

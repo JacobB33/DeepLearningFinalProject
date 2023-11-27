@@ -22,7 +22,7 @@ class Trainer:
     Includes evaluation runs.
     """
 
-    def __init__(self, trainer_config: TrainerConfig, model, optimizer, train_dataset, test_dataset=None):
+    def __init__(self, trainer_config: TrainerConfig, model, optimizer, train_dataset, test_dataset=None, cfg=None):
         self.config = trainer_config
         # set torchrun variables
         self.local_rank = int(os.environ["LOCAL_RANK"])
@@ -50,7 +50,7 @@ class Trainer:
 
         if trainer_config.use_wandb:
             if self.global_rank == 0:
-                wandb.init(project="BrainScanEncoder", config=asdict(trainer_config))
+                wandb.init(project="BrainScanEncoder", config=cfg)
 
 
     def _prepare_dataloader(self, dataset: Dataset):
