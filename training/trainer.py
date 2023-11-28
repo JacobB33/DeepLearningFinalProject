@@ -152,7 +152,8 @@ class Trainer:
                     self._save_snapshot(epoch)
                 
                 if self.lr_scheduler:
-                    self.lr_scheduler.step()
+                    # assumes that this is the reduce on plateau one
+                    self.lr_scheduler.step(metrics=batch_avg_loss)
         
         if self.global_rank == 0:
             self._save_snapshot(epoch)
