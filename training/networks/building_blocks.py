@@ -54,13 +54,22 @@ class EncodeBS(nn.Module):
     def __init__(self, input_size=7604, num_output_channels=8):
         super().__init__()
         # 1024 is the embedding size of the clip model
-        self.encoder = nn.Linear(input_size, 1024*num_output_channels)
+        self.encoder1 = nn.Linear(input_size, 1024*num_output_channels)
+        self.encoder2 = nn.Linear(1024*num_output_channels, 1024*num_output_channels)
+        self.encoder3 = nn.Linear(1024*num_output_channels, 1024*num_output_channels)
+
         self.relu = nn.ReLU(inplace=True)
         self.num_output_channels = num_output_channels
     
     def forward(self, x):
-        x = self.encoder(x)
+        x = self.encoder1(x)
         x = self.relu(x)
+        skip = x
+        x = self.encoder2(x)
+        x = self.relu(x)
+        x = self.encoder3(x)
+        x = x + skip
+        self.relu(x)
         x = x.reshape(x.shape[0], self.num_output_channels, -1)
         return x
 

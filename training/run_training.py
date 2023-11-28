@@ -15,35 +15,56 @@ import random
 def ddp_setup():
     init_process_group(backend="nccl")
     torch.cuda.set_device(int(os.environ["LOCAL_RANK"]))
-
-def get_train_objs(model_config: ModelConfig, opt_cfg: OptimizerConfig, data_cfg: DataConfig, compile: bool, cfg):
+def get_train_test(train_len):
     dataset = get_train_dataset()
-    train_len = int(len(dataset) * data_cfg.train_percentage)
+    
     indicies = list(range(len(dataset)))
     random.shuffle(indicies)
     train_idx, test_idx = indicies[:train_len], indicies[train_len:]
-    train_set = torch.utils.data.Subset(dataset, train_idx)
-    test_set = torch.utils.data.Subset(dataset, test_idx)
-    cfg['test_idx'] = test_idx 
-    # train_set, test_set = random_split(dataset, [train_len, len(dataset) - train_len])
+    train_set, test_set = torch.utils.data.Subset(dataset, train_idx), torch.utils.data.Subset(dataset, test_idx)
+
+    
+    return train_set, test_set, test_idx
+
+def get_train_objs(cfg):
+    model_config = ModelConfig(**cfg['model_config'])
+    opt_cfg = OptimizerConfig(**cfg['optimizer_config'])
+    data_cfg = DataConfig(**cfg['data_config'])
+        
+    train_set, test_set, test_idx = get_train_test(int(len(get_train_dataset())*data_cfg.train_percentage))    
+    cfg['test_idx'] = test_idx
     
     model = BrainScanEmbedder(model_config)
+    if cfg['compile']:
+        model = torch.compile(model)
+    
     optimizer = create_optimizer(model, opt_cfg)
-    print(test_idx)
-    return model, optimizer, train_set, test_set
+    if cfg['compile'] == True:
+        compile()
+    lr_scheduler = None
+    if 'lr_scheduler_config' in cfg:
+        lr_scheduler_config = LRSchedulerConfig(**cfg['lr_scheduler_config'])
+        warmup_config = None
+        if 'warmup_config' in cfg:
+            warmup_config = WarmUpConfig(**cfg['warmup_config'])
+        
+        lr_scheduler = create_lr_scheduler(optimizer, lr_scheduler_config, warmup_config)
+
+
+    return model, optimizer, train_set, test_set, lr_scheduler
 
 def main(cfg_path):
     cfg = yaml.load(open(cfg_path, 'r'), yaml.FullLoader)
     ddp_setup()
     print(cfg)
-
-    model_config = ModelConfig(**cfg['model_config'])
-    opt_config = OptimizerConfig(**cfg['optimizer_config'])
-    data_config = DataConfig(**cfg['data_config'])
+    
     trainer_config = TrainerConfig(**cfg['trainer_config'])
-
-    model, optimizer, train_data, test_data = get_train_objs(model_config, opt_config, data_config, cfg['compile'], cfg)
-    trainer = Trainer(trainer_config, model, optimizer, train_data, test_data, cfg)
+  
+    
+    model, optimizer, train_data, test_data, lr_scheduler = get_train_objs(cfg)
+    
+    
+    trainer = Trainer(trainer_config, model, optimizer, train_data, test_data, lr_scheduler, cfg)
     trainer.train()
 
     destroy_process_group()

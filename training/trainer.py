@@ -22,7 +22,7 @@ class Trainer:
     Includes evaluation runs.
     """
 
-    def __init__(self, trainer_config: TrainerConfig, model, optimizer, train_dataset, test_dataset=None, cfg=None):
+    def __init__(self, trainer_config: TrainerConfig, model, optimizer, train_dataset,  test_dataset=None, lr_scheduler=None, cfg=None):
         self.config = trainer_config
         # set torchrun variables
         self.local_rank = int(os.environ["LOCAL_RANK"])
@@ -37,7 +37,8 @@ class Trainer:
         self.model = model.to(self.local_rank)
         self.optimizer = optimizer
         self.save_every = self.config.save_every
-
+        self.lr_scheduler = lr_scheduler
+        self.use_wandb = trainer_config.use_wandb
         # initialize amp. Should speed up by 2x or 3x
         if self.config.use_amp:
             self.scaler = torch.cuda.amp.GradScaler()
@@ -50,7 +51,7 @@ class Trainer:
 
         if trainer_config.use_wandb:
             if self.global_rank == 0:
-                wandb.init(project="BrainScanEncoder", config=cfg)
+                wandb.init(project="BrainScanEncoder", name=trainer_config.run_name, config=cfg)
 
 
     def _prepare_dataloader(self, dataset: Dataset):
@@ -138,10 +139,22 @@ class Trainer:
                 test_loss = torch.tensor([test_avg_loss]).to(f'cuda:{self.local_rank}')
                 dist.reduce(test_loss, 0, dist.ReduceOp.SUM)
             if self.global_rank == 0:
-                if self.test_loader:
-                    test_loss = test_loss / self.world_size
-                    wandb.log({"loss": batch_avg_loss, "test_loss": test_loss.item()})
-                else:
-                    wandb.log({"loss": batch_avg_loss})
+                if self.use_wandb:
+                    log_dict = {"loss": batch_avg_loss, "learning_rate": self.optimizer.param_groups[0]['lr']}
+                    if self.test_loader:
+                        test_loss = test_loss / self.world_size
+                        log_dict['test_loss'] = test_loss.item()
+                        wandb.log(log_dict)
+                    else:
+                        wandb.log(log_dict)
+                
                 if epoch % self.save_every == 0:
                     self._save_snapshot(epoch)
+                
+                if self.lr_scheduler:
+                    self.lr_scheduler.step()
+        
+        if self.global_rank == 0:
+            self._save_snapshot(epoch)
+            if self.use_wandb:
+                wandb.save(self.config.snapshot_path)

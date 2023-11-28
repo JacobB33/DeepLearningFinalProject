@@ -28,4 +28,3 @@ class BrainScanEmbedder(nn.Module):
             return output
         loss = F.mse_loss(output, targets)
         return output, loss
-

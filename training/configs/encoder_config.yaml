@@ -3,16 +3,26 @@ trainer_config:
   batch_size: 1024
   data_loader_workers: 4
   grad_norm_clip: 1.0
-  snapshot_path: use_first_embbed.pt
+  snapshot_path: new_encoder_1.pt
   save_every: 3
   use_amp: True
   use_wandb: True
+  run_name: new-encoder
+  use_lr_scheduler: True
+lr_scheduler_config:
+  type: plateau
+  gamma: 0.5
+  patience: 10
+  mode: min
+warmup_config:
+  warmup_steps: 8
+  warmup_lr: 0.00001
 optimizer_config:
-  optimizer: adam
-  weight_decay: 0.1
-  learning_rate: 0.0001
+  optimizer: adamw
+  weight_decay: 0.001
+  learning_rate: 0.001
 data_config:
-  train_percentage: 0.95
+  train_percentage: 0.98
 model_config:
   upscale_schedule: [8, 16, 32, 64, 77]
-compile: True
+compile: False

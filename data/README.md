@@ -34,14 +34,18 @@ The data is processed into a dictionary object that is of the following form (pa
 The processed image caption embeddings are stored in the folder ``./data/processed_data/embeddings`` and the betas of the ventral lobe (a numpy array of length 7604) is stored in the folder ``./data/processed_data/betas/session_i/trial_j``. The json described above is saved at ``./data/processed_data/annotations.json``. The image files are saved to ``./data/processed_data/images``. The processed data is not included in the repository due to its size.
 
 ## Already Processed Data
-You can find a current version of the processed data at [the following location](https://drive.google.com/file/d/1lLWr0C8mjgnUq0lFIUmEKUqjsh7jzI6D/view?usp=drive_link). Use the following command to download it:
+You can find a current version of the processed data at [the following location](https://drive.google.com/file/d/1lLWr0C8mjgnUq0lFIUmEKUqjsh7jzI6D/view?usp=sharing). Use the following command to download it:
 ```bash
 sudo apt install gdown
-gdown https://drive.google.com/file/d/1lLWr0C8mjgnUq0lFIUmEKUqjsh7jzI6D/view?usp=drive_link
+cd data
+gdown https://drive.google.com/uc?id=1lLWr0C8mjgnUq0lFIUmEKUqjsh7jzI6D
 ```
 Then unzip it:
 ```bash
+sudo apt install unzip
+unzip processed_data.zip processed_data
 ```
+
 # Instructions to download the data
 
 For this project, we need to have the aws cli installed. In order to do this run:
