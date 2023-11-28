@@ -61,7 +61,7 @@ class WarmUpConfig:
 
 
 def create_lr_scheduler(optimizer, config: LRSchedulerConfig, warmup_config: WarmUpConfig = None):
-    if warmup_config is not None:
+    if warmup_config:
         warmup_lr = torch.optim.lr_scheduler.ConstantLR(optimizer, factor=warmup_config.warmup_lr, total_iters=warmup_config.warmup_steps)
     
     if config.type == "step":
@@ -71,7 +71,7 @@ def create_lr_scheduler(optimizer, config: LRSchedulerConfig, warmup_config: War
     else:
         raise ValueError(f"Scheduler {config.scheduler} not supported")
     
-    if warmup_lr is None:
+    if warmup_config is None:
         return lr_scheduler
     else:
         return torch.optim.lr_scheduler.SequentialLR(optimizer, schedulers=[warmup_lr, lr_scheduler], milestones=[warmup_config.warmup_steps])
