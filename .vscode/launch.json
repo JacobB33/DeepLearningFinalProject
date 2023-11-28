@@ -13,21 +13,38 @@
             "justMyCode": true
         },
         {
+            "name": "TextToBrain",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}/StableDiffusionFork/scripts/brain2img.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "--n_samples",
+                "1",
+                "--ckpt",
+                "/home/jacob/projects/DeepLearningFinalProject/StableDiffusionFork/checkpoints/512-base-ema.ckpt",
+                "--config",
+                "./StableDiffusionFork/configs/stable-diffusion/v2-inference.yaml"
+            ]
+        },
+        {
             "name": "text2image",
             "type": "python",
             "request": "launch",
             "program": "${workspaceFolder}/StableDiffusionFork/scripts/txt2img.py",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["--n_samples",
-            "1",
-            "--prompt",
-            "a professional photograph of an astronaut riding a horse",
-            "--ckpt",
-            "${workspaceFolder}/StableDiffusionFork/checkpoints/512-base-ema.ckpt",
-            "--config",
-            "${workspaceFolder}/StableDiffusionFork/configs/stable-diffusion/v2-inference.yaml"
-        ]
+            "args": [
+                "--n_samples",
+                "1",
+                "--prompt",
+                "a professional photograph of an astronaut riding a horse",
+                "--ckpt",
+                "${workspaceFolder}/StableDiffusionFork/checkpoints/512-base-ema.ckpt",
+                "--config",
+                "${workspaceFolder}/StableDiffusionFork/configs/stable-diffusion/v2-inference.yaml"
+            ]
         }
     ]
 }

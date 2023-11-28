@@ -8,3 +8,6 @@ wandb/
 *.log
 __pycache__/
 *.zip
+.idea/
+outputs/
+*.pt
