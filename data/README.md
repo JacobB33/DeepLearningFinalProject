@@ -1,5 +1,7 @@
 # Instructions to process the data
-run the following command:
+This is the instructions for downloading the data from the NSD or natural scene dataset. This is from this paper: [Allen, St-Yves, Wu, Breedlove, Prince, Dowdle, Nau, Caron, Pestilli, Charest, Hutchinson, Naselaris*, & Kay*. A massive 7T fMRI dataset to bridge cognitive neuroscience and artificial intelligence. Nature Neuroscience (2021).](https://doi.org/10.1038/s41593-021-00962-x)
+
+To process the data run the following command:
 ```bash
 python process_data.py
 ```
@@ -33,7 +35,7 @@ The data is processed into a dictionary object that is of the following form (pa
 ```
 The processed image caption embeddings are stored in the folder ``./data/processed_data/embeddings`` and the betas of the ventral lobe (a numpy array of length 7604) is stored in the folder ``./data/processed_data/betas/session_i/trial_j``. The json described above is saved at ``./data/processed_data/annotations.json``. The image files are saved to ``./data/processed_data/images``. The processed data is not included in the repository due to its size.
 
-## Already Processed Data
+## Pre Processed Data
 You can find a current version of the processed data at [the following location](https://drive.google.com/file/d/1lLWr0C8mjgnUq0lFIUmEKUqjsh7jzI6D/view?usp=sharing). Use the following command to download it:
 ```bash
 sudo apt install gdown
@@ -43,12 +45,12 @@ gdown https://drive.google.com/uc?id=1lLWr0C8mjgnUq0lFIUmEKUqjsh7jzI6D
 Then unzip it:
 ```bash
 sudo apt install unzip
-unzip processed_data.zip processed_data
+unzip processed_data.zip
 ```
 
-# Instructions to download the data
+# Instructions to download the raw data
 
-For this project, we need to have the aws cli installed. In order to do this run:
+For this project, we need to have the aws cli installed. To do this run:
 ```bash
 sudo apt install awscli
 ```
@@ -59,7 +61,7 @@ aws configure
 ```
 
 ## Run these commands to download the data
-Be sure to remove the --dryrun flag to actually download all of the data. You will get a lot of access denied which is totally fine (some of the files are not yet released).
+Be sure to remove the --dryrun flag to actually download all of the data. You will get a lot of access denied which is fine (some of the files are not yet released). This only downloads the data relevant to subject 1 and for the experiments we need. I think that there is extra data included but I don't know how to remove it.
 **Be sure to run this inside the data folder.**
 
 ### Download the nsd_data folder
@@ -68,7 +70,7 @@ aws s3 sync --dryrun s3://natural-scenes-dataset/nsddata ./nsd/nsddata --exclude
 ```
 This is 6gb
 
-### command for priors folder:
+### Command for priors folder:
 ```bash
 aws s3 sync --dryrun s3://natural-scenes-dataset/nsddata_betas ./nsd/nsddata_betas --exclude "*func1mm*" --exclude "*subj02*" --exclude "*subj03*" --exclude "*subj04*" --exclude "*subj05*" --exclude "*subj06*" --exclude "*subj07*" --exclude "*subj08*"
 ```
