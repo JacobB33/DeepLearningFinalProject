@@ -3,11 +3,11 @@ trainer_config:
   batch_size: 320
   data_loader_workers: 16
   grad_norm_clip: 1.0
-  snapshot_path: transformer-5.pt
+  snapshot_path: attention-1.pt
   save_every: 15
   use_amp: False
   use_wandb: True
-  run_name: transformer-5
+  run_name: attention-1
   use_lr_scheduler: True
 lr_scheduler_config:
   type: plateau
