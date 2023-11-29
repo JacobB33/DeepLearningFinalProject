@@ -1,1 +1,1 @@
-from .encoder import BrainScanEmbedder, NewBrainScanEmbedder
+from .encoder import BrainScanEmbedder
