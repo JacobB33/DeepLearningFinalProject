@@ -1,6 +1,6 @@
 trainer_config:
   max_epochs: 100
-  batch_size: 512
+  batch_size: 256
   data_loader_workers: 16 
   grad_norm_clip: 0.8
   snapshot_path: transformer-3.pt
@@ -25,7 +25,7 @@ data_config:
   train_percentage: 0.98
 model_config:
   upscale_schedule: [8, 16, 32, 64, 77]
-  nhead: 32
-  num_transformer_layers: 16
+  nhead: 16
+  num_transformer_layers: 4
 compile: False
 
