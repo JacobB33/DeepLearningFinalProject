@@ -1,6 +1,6 @@
 import yaml
 
-from networks.encoder import BrainScanEmbedder
+from networks.encoder import BrainScanEmbedder, FancyBrainScanEmbedder
 from trainer import Trainer
 from training.configs import *
 
@@ -15,6 +15,7 @@ import random
 def ddp_setup():
     init_process_group(backend="nccl")
     torch.cuda.set_device(int(os.environ["LOCAL_RANK"]))
+
 def get_train_test(train_len):
     dataset = get_train_dataset()
     
@@ -33,8 +34,12 @@ def get_train_objs(cfg):
         
     train_set, test_set, test_idx = get_train_test(int(len(get_train_dataset())*data_cfg.train_percentage))    
     cfg['test_idx'] = test_idx
-    
-    model = BrainScanEmbedder(model_config)
+    if cfg['model_type'] == 'normal':
+        model = BrainScanEmbedder(model_config)
+    elif cfg['model_type'] == 'fancy':
+        model = FancyBrainScanEmbedder(model_config)
+    else:
+        raise ValueError(f"Model type {cfg['model_type']} not supported")
     if cfg['compile']:
         model = torch.compile(model)
     
@@ -71,4 +76,5 @@ def main(cfg_path):
 
 
 if __name__ == "__main__":
-    main('./training/configs/encoder_config.yaml')
+    # main('./training/configs/encoder_config.yaml')
+    main('./training/configs/fancy_encoder_config.yaml')

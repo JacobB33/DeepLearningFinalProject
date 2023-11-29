@@ -63,7 +63,8 @@ class EncodeBS(nn.Module):
     
     def forward(self, x):
         x = self.encoder1(x)
-        x = self.relu(x)
+        # using swoosh activations
+        x = x * torch.sigmoid(x)
         # skip = x
         # x = self.encoder2(x)
         # x = self.relu(x)
