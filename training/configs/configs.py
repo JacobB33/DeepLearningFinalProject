@@ -25,6 +25,9 @@ class TrainerConfig:
 @dataclass
 class ModelConfig:
     upscale_schedule: List[int]
+    num_transformer_layers: int
+    nhead: int
+
 
 
 @dataclass
