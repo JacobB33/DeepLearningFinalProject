@@ -23,7 +23,7 @@ data_config:
   train_percentage: 0.98
 model_config:
   upscale_schedule: [8, 16, 32, 64, 77]
-  nhead: 12
+  nhead: 64
   num_transformer_layers: 8
 compile: False
 
