@@ -1,5 +1,5 @@
 trainer_config:
-  max_epochs: 60
+  max_epochs: 100
   batch_size: 512
   data_loader_workers: 16 
   grad_norm_clip: 0.8
