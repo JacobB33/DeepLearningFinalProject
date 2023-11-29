@@ -1,28 +1,27 @@
 trainer_config:
   max_epochs: 100
   batch_size: 1024
-  data_loader_workers: 4
-  grad_norm_clip: 1.0
-  snapshot_path: new_encoder_1.pt
+  data_loader_workers: 16 
+  grad_norm_clip: 0.8
+  snapshot_path: full-run-3.pt
   save_every: 3
-  use_amp: True
+  use_amp: False
   use_wandb: True
-  run_name: new-encoder
+  run_name: full-run-3
   use_lr_scheduler: True
 lr_scheduler_config:
   type: plateau
   gamma: 0.5
-  patience: 10
+  patience: 4
   mode: min
-warmup_config:
-  warmup_steps: 8
-  warmup_lr: 0.00001
+  threshold: 0.02
 optimizer_config:
-  optimizer: adamw
-  weight_decay: 0.001
+  optimizer: adam
+  weight_decay: 0.00001
   learning_rate: 0.001
 data_config:
   train_percentage: 0.98
 model_config:
   upscale_schedule: [8, 16, 32, 64, 77]
 compile: False
+
