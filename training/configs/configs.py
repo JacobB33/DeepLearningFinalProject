@@ -57,6 +57,9 @@ class LRSchedulerConfig:
     mode: str = None
     patience: int = None
     threshold: float = None
+    min_lr: float = None
+    cooldown: int = None
+    
     
 @dataclass
 class WarmUpConfig:
@@ -71,7 +74,8 @@ def create_lr_scheduler(optimizer, config: LRSchedulerConfig, warmup_config: War
     if config.type == "step":
         lr_scheduler =  torch.optim.lr_scheduler.StepLR(optimizer, step_size=config.step_size, gamma=config.gamma)
     elif config.type == "plateau":
-        lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=config.gamma, patience=config.patience, mode=config.mode, threshold=config.threshold)
+        lr_scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=config.gamma, patience=config.patience, mode=config.mode, threshold=config.threshold, min_lr=config.min_lr,
+                                                                  cooldown=config.cooldown)
     else:
         raise ValueError(f"Scheduler {config.scheduler} not supported")
     

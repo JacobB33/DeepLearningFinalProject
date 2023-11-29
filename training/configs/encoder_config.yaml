@@ -3,11 +3,11 @@ trainer_config:
   batch_size: 512
   data_loader_workers: 16 
   grad_norm_clip: 0.8
-  snapshot_path: transformer-2.pt
+  snapshot_path: transformer-3.pt
   save_every: 15
   use_amp: False
   use_wandb: True
-  run_name: transformer-2.pt
+  run_name: transformer-3
   use_lr_scheduler: True
 lr_scheduler_config:
   type: plateau
@@ -15,6 +15,8 @@ lr_scheduler_config:
   patience: 4
   mode: min
   threshold: 0.004
+  min_lr: 0.00001
+  cooldown: 4
 optimizer_config:
   optimizer: adam
   weight_decay: 0.000001
@@ -23,7 +25,7 @@ data_config:
   train_percentage: 0.98
 model_config:
   upscale_schedule: [8, 16, 32, 64, 77]
-  nhead: 64
-  num_transformer_layers: 8
+  nhead: 32
+  num_transformer_layers: 16
 compile: False
 
