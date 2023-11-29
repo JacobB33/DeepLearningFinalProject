@@ -11,7 +11,7 @@ trainer_config:
   use_lr_scheduler: True
 lr_scheduler_config:
   type: plateau
-  gamma: 0.5
+  gamma: 0.3
   patience: 4
   mode: min
   threshold: 0.02
