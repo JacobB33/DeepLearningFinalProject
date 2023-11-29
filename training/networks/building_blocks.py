@@ -5,6 +5,7 @@ import numpy as np
 import os
 
 
+
 class ResBlock(nn.Module):
     """This is a residual block. It is 2 1d convolutions with a residual connection."""
     def __init__(self, channels, kernel_size=3, stride=1, padding=1):
@@ -15,18 +16,20 @@ class ResBlock(nn.Module):
         torch.nn.init.kaiming_normal_(self.conv_2.weight, nonlinearity="relu")
         self.batch_norm_1 = nn.BatchNorm1d(channels)
         self.batch_norm_2 = nn.BatchNorm1d(channels)
-        self.relu = nn.ReLU(inplace=True)
+        # self.relu = nn.ReLU(inplace=True)
+        self.silu = nn.SiLU(inplace=True)
         
     def forward(self, x):
         residual = x
         x = self.conv_1(x)
         x = self.batch_norm_1(x)
-        x = self.relu(x)
+        # x = self.relu(x)
+        x = self.silu(x)
         x = self.conv_2(x)
         x = self.batch_norm_2(x)
         x += residual
-        x = self.relu(x)
-
+        # x = self.relu(x)
+        x = self.silu(x)
         return x
 
 class DoubleConv(nn.Module):
@@ -39,12 +42,14 @@ class DoubleConv(nn.Module):
         layers = [
             nn.Conv1d(in_channels, mid_channels, kernel_size=3, padding=1, bias=False),
             nn.BatchNorm1d(mid_channels),
-            nn.ReLU(inplace=True),
+            # nn.ReLU(inplace=True),
+            nn.SiLU(inplace=True),
             nn.Conv1d(mid_channels, out_channels, kernel_size=3, padding=1, bias=False),
             nn.BatchNorm1d(out_channels),
         ]
         if activation:
-            layers.append(nn.ReLU(inplace=True))
+            # layers.append(nn.ReLU(inplace=True))
+            layers.append(nn.SiLU(inplace=True))
         self.double_conv = nn.Sequential(*layers)
 
     def forward(self, x):
@@ -58,13 +63,14 @@ class EncodeBS(nn.Module):
         # self.encoder2 = nn.Linear(1024*num_output_channels, 1024*num_output_channels)
         # self.encoder3 = nn.Linear(1024*num_output_channels, 1024*num_output_channels)
 
-        self.relu = nn.ReLU(inplace=True)
+        # self.relu = nn.ReLU(inplace=True)
+        self.silu = nn.SiLU(inplace=True)
         self.num_output_channels = num_output_channels
     
     def forward(self, x):
         x = self.encoder1(x)
         # using swoosh activations
-        x = x * torch.sigmoid(x)
+        x = self.silu(x)
         # skip = x
         # x = self.encoder2(x)
         # x = self.relu(x)
