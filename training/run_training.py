@@ -1,3 +1,5 @@
+# command: OMP_NUM_THREADS=32 torchrun --nnodes 1 --nproc_per_node 8 ./training/run_training.py
+
 import yaml
 
 from networks.encoder import BrainScanEmbedder, FancyBrainScanEmbedder

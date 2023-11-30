@@ -16,20 +16,20 @@ class ResBlock(nn.Module):
         torch.nn.init.kaiming_normal_(self.conv_2.weight, nonlinearity="relu")
         self.batch_norm_1 = nn.BatchNorm1d(channels)
         self.batch_norm_2 = nn.BatchNorm1d(channels)
-        # self.relu = nn.ReLU(inplace=True)
-        self.silu = nn.SiLU(inplace=True)
+        self.relu = nn.ReLU(inplace=True)
+        # self.silu = nn.SiLU(inplace=True)
         
     def forward(self, x):
         residual = x
         x = self.conv_1(x)
         x = self.batch_norm_1(x)
-        # x = self.relu(x)
-        x = self.silu(x)
+        x = self.relu(x)
+        # x = self.silu(x)
         x = self.conv_2(x)
         x = self.batch_norm_2(x)
         x += residual
-        # x = self.relu(x)
-        x = self.silu(x)
+        x = self.relu(x)
+        # x = self.silu(x)
         return x
 
 class DoubleConv(nn.Module):
@@ -63,14 +63,15 @@ class EncodeBS(nn.Module):
         # self.encoder2 = nn.Linear(1024*num_output_channels, 1024*num_output_channels)
         # self.encoder3 = nn.Linear(1024*num_output_channels, 1024*num_output_channels)
 
-        # self.relu = nn.ReLU(inplace=True)
-        self.silu = nn.SiLU(inplace=True)
+        self.relu = nn.ReLU(inplace=True)
+        # self.silu = nn.SiLU(inplace=True)
         self.num_output_channels = num_output_channels
     
     def forward(self, x):
         x = self.encoder1(x)
         # using swoosh activations
-        x = self.silu(x)
+        # x = self.silu(x)
+        x = self.relu(x)
         # skip = x
         # x = self.encoder2(x)
         # x = self.relu(x)
