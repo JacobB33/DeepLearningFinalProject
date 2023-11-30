@@ -34,7 +34,7 @@ class Test(nn.Module):
         super().__init__()
         self.backbone = nn.Sequential(
             nn.Linear(7604, 7604),
-            nn.ReLU(),
+            nn.Tanh(),
             nn.Linear(7604, 1024* 77),
             nn.Unflatten(1, (77, 1024)),
         )
