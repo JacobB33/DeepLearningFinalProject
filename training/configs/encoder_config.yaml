@@ -1,13 +1,13 @@
 trainer_config:
   max_epochs: 200
-  batch_size: 12
+  batch_size: 512
   data_loader_workers: 16
   grad_norm_clip: 1.0
-  snapshot_path: attention-4.pt
+  snapshot_path: attention-5.pt
   save_every: 15
   use_amp: False
   use_wandb: True
-  run_name: attention-4
+  run_name: attention-5
   use_lr_scheduler: True
 lr_scheduler_config:
   type: plateau
@@ -20,11 +20,11 @@ lr_scheduler_config:
 optimizer_config:
   optimizer: adam
   weight_decay: 0.0
-  learning_rate: 0.001
+  learning_rate: 0.0001
 data_config:
   train_percentage: 0.98
 model_config:
-  upscale_schedule: [8, 16, 32, 48, 77]
+  upscale_schedule: [8, 32, 48, 77]
   nhead: 8
   num_transformer_layers: -1
 compile: False

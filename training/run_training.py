@@ -29,21 +29,7 @@ def get_train_test(train_len):
 
     
     return train_set, test_set, test_idx
-class Test(nn.Module):
-    def __init__(self) -> None:
-        super().__init__()
-        self.backbone = nn.Sequential(
-            nn.Linear(7604, 7604),
-            nn.Tanh(),
-            nn.Linear(7604, 1024* 77),
-            nn.Unflatten(1, (77, 1024)),
-        )
-    def forward(self, input, target=None):
-        input =  self.backbone(input)
-        if target is None:
-            return input
-        loss = torch.nn.functional.mse_loss(input, target)
-        return input, loss
+
         
 def get_train_objs(cfg):
     model_config = ModelConfig(**cfg['model_config'])
@@ -52,15 +38,15 @@ def get_train_objs(cfg):
         
     train_set, test_set, test_idx = get_train_test(int(len(get_train_dataset())*data_cfg.train_percentage))    
     cfg['test_idx'] = test_idx
-    # if cfg['model_type'] == 'normal':
-    #     model = BrainScanEmbedder(model_config)
-    # elif cfg['model_type'] == 'fancy':
-    #     model = FancyBrainScanEmbedder(model_config)
-    # elif cfg['model_type'] == 'plzwork':
-    #     model = plzWork(model_config)
-    # else:
-    #     raise ValueError(f"Model type {cfg['model_type']} not supported")
-    model = Test()
+    if cfg['model_type'] == 'normal':
+        model = BrainScanEmbedder(model_config)
+    elif cfg['model_type'] == 'fancy':
+        model = FancyBrainScanEmbedder(model_config)
+    elif cfg['model_type'] == 'plzwork':
+        model = plzWork(model_config)
+    else:
+        raise ValueError(f"Model type {cfg['model_type']} not supported")
+
     if cfg['compile']:
         model = torch.compile(model)
     
