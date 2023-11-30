@@ -25,7 +25,7 @@ class plzWork(nn.Module):
         output = self.fc2(output)
         output = self.relu(output)
         output = self.fc3(output)
-        output = output.reshape(output.shape[0], self.num_output_channels, -1)
+        output = output.reshape(output.shape[0], 77, -1)
         if targets is None:
             return output
         loss = F.mse_loss(output, targets)
