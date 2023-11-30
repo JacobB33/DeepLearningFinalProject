@@ -5,6 +5,7 @@ import yaml
 from networks.encoder import BrainScanEmbedder, FancyBrainScanEmbedder, plzWork
 from trainer import Trainer
 from training.configs import *
+import torch.nn as nn
 
 import os
 import torch
@@ -28,7 +29,22 @@ def get_train_test(train_len):
 
     
     return train_set, test_set, test_idx
-
+class Test(nn.Module):
+    def __init__(self) -> None:
+        super().__init__()
+        self.backbone = nn.Sequential(
+            nn.Linear(7604, 7604),
+            nn.ReLU(),
+            nn.Linear(7604, 1024* 77),
+            nn.Unflatten(1, (77, 1024)),
+        )
+    def forward(self, input, target=None):
+        input =  self.backbone(input)
+        if target is None:
+            return input
+        loss = torch.nn.functional.mse_loss(input, target)
+        return input, loss
+        
 def get_train_objs(cfg):
     model_config = ModelConfig(**cfg['model_config'])
     opt_cfg = OptimizerConfig(**cfg['optimizer_config'])
@@ -36,14 +52,15 @@ def get_train_objs(cfg):
         
     train_set, test_set, test_idx = get_train_test(int(len(get_train_dataset())*data_cfg.train_percentage))    
     cfg['test_idx'] = test_idx
-    if cfg['model_type'] == 'normal':
-        model = BrainScanEmbedder(model_config)
-    elif cfg['model_type'] == 'fancy':
-        model = FancyBrainScanEmbedder(model_config)
-    elif cfg['model_type'] == 'plzwork':
-        model = plzWork(model_config)
-    else:
-        raise ValueError(f"Model type {cfg['model_type']} not supported")
+    # if cfg['model_type'] == 'normal':
+    #     model = BrainScanEmbedder(model_config)
+    # elif cfg['model_type'] == 'fancy':
+    #     model = FancyBrainScanEmbedder(model_config)
+    # elif cfg['model_type'] == 'plzwork':
+    #     model = plzWork(model_config)
+    # else:
+    #     raise ValueError(f"Model type {cfg['model_type']} not supported")
+    model = Test()
     if cfg['compile']:
         model = torch.compile(model)
     
@@ -80,6 +97,6 @@ def main(cfg_path):
 
 
 if __name__ == "__main__":
-    # main('./training/configs/encoder_config.yaml')
+    main('./training/configs/encoder_config.yaml')
     # main('./training/configs/fancy_encoder_config.yaml')
-    main('./training/configs/plzwork_config.yaml')
+    # main('./training/configs/plzwork_config.yaml')

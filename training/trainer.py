@@ -117,6 +117,7 @@ class Trainer:
         # capture snapshot
         model = self.model
         raw_model = model.module if hasattr(model, "module") else model
+        
         snapshot = Snapshot(
             model_state=raw_model.state_dict(),
             optimizer_state=self.optimizer.state_dict(),
