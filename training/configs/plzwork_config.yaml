@@ -1,0 +1,31 @@
+trainer_config:
+  max_epochs: 100
+  batch_size: 512
+  data_loader_workers: 16
+  grad_norm_clip: 1.0
+  snapshot_path: plzwork.pt
+  save_every: 15
+  use_amp: False
+  use_wandb: True
+  run_name: plzwork
+  use_lr_scheduler: True
+lr_scheduler_config:
+  type: plateau
+  gamma: 0.5
+  patience: 10
+  mode: min
+  threshold: 0.004
+  min_lr: 0.00001
+  cooldown: 4
+optimizer_config:
+  optimizer: adam
+  weight_decay: 0.0
+  learning_rate: 0.001
+data_config:
+  train_percentage: 0.98
+model_config:
+  upscale_schedule: -1
+  nhead: -1
+  num_transformer_layers: -1
+compile: False
+model_type: plzwork

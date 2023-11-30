@@ -2,7 +2,7 @@
 
 import yaml
 
-from networks.encoder import BrainScanEmbedder, FancyBrainScanEmbedder
+from networks.encoder import BrainScanEmbedder, FancyBrainScanEmbedder, plzWork
 from trainer import Trainer
 from training.configs import *
 
@@ -40,6 +40,8 @@ def get_train_objs(cfg):
         model = BrainScanEmbedder(model_config)
     elif cfg['model_type'] == 'fancy':
         model = FancyBrainScanEmbedder(model_config)
+    elif cfg['model_type'] == 'plzwork':
+        model = plzWork(model_config)
     else:
         raise ValueError(f"Model type {cfg['model_type']} not supported")
     if cfg['compile']:
@@ -79,4 +81,5 @@ def main(cfg_path):
 
 if __name__ == "__main__":
     # main('./training/configs/encoder_config.yaml')
-    main('./training/configs/fancy_encoder_config.yaml')
+    # main('./training/configs/fancy_encoder_config.yaml')
+    main('./training/configs/plzwork_config.yaml')

@@ -8,6 +8,31 @@ from training.networks.building_blocks import ResBlock, DoubleConv, EncodeBS
 from training.networks.fancy_building_blocks import AttnBlock, ResnetBlock
 
 
+class plzWork(nn.Module):
+    def __init__(self, model_config: ModelConfig) -> None:
+        super().__init__()
+        self.fc1 = nn.Linear(7604, 7604)
+        self.relu = nn.ReLU(inplace=True)
+        self.fc2 = nn.Linear(7604, 7604)
+        self.fc3 = nn.Linear(7604, 1024 * 77)
+        # self.bn1 = nn.BatchNorm1d(7604)
+        # self.bn2 = nn.BatchNorm1d(7604)
+        # self.bn3 = nn.BatchNorm1d(1024 * 77)
+    
+    def forward(self, source, targets=None):
+        output = self.fc1(source)
+        output = self.relu(output)
+        output = self.fc2(output)
+        output = self.relu(output)
+        output = self.fc3(output)
+        output = output.reshape(output.shape[0], self.num_output_channels, -1)
+        if targets is None:
+            return output
+        loss = F.mse_loss(output, targets)
+        return output, loss
+        
+        
+
 class BrainScanEmbedder(nn.Module):
     """This needs to be batched input of channel, brainscan or (c, 7604). Outputs (c, 77, 1024)"""
     def __init__(self, model_config: ModelConfig):
