@@ -83,10 +83,10 @@ class EncodeBS(nn.Module):
         return x
 
 class AttentionModule(nn.Module):   
-    def __init__(self, embedding_dim, num_heads):
+    def __init__(self, embedding_dim, nhead):
         super().__init__()
         self.embedding_dim = embedding_dim
-        self.attention = nn.MultiheadAttention(embed_dim=embedding_dim, num_heads=num_heads)
+        self.attention = nn.MultiheadAttention(embed_dim=embedding_dim, num_heads=nhead)
         self.query = nn.Linear(embedding_dim, embedding_dim)
         self.key = nn.Linear(embedding_dim, embedding_dim)
         self.value = nn.Linear(embedding_dim, embedding_dim)
