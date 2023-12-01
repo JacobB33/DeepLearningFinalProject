@@ -54,7 +54,8 @@ class DoubleConv(nn.Module):
 
     def forward(self, x):
         return self.double_conv(x)
-    
+
+
 class EncodeBS(nn.Module):
     def __init__(self, input_size=7604, num_output_channels=8):
         super().__init__()
@@ -81,6 +82,19 @@ class EncodeBS(nn.Module):
         x = x.reshape(x.shape[0], self.num_output_channels, -1)
         return x
 
+class AttentionModule(nn.Module):   
+    def __init__(self, embedding_dim, num_heads):
+        super().__init__()
+        self.embedding_dim = embedding_dim
+        self.attention = nn.MultiheadAttention(embed_dim=embedding_dim, num_heads=num_heads)
+        self.query = nn.Linear(embedding_dim, embedding_dim)
+        self.key = nn.Linear(embedding_dim, embedding_dim)
+        self.value = nn.Linear(embedding_dim, embedding_dim)
+    def forward(self, x):
+        q = self.query(x)
+        k = self.key(x)
+        v = self.value(x)
+        return self.attention(q, k, v)[0]
 
 if __name__ == "__main__":  
     test_tensor = torch.randn(32, 7604)
