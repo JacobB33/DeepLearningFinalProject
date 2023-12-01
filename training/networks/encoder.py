@@ -23,11 +23,11 @@ class BrainScanEmbedder(nn.Module):
         for i in range(1, len(upscale_schedule)):
             module.append(DoubleConv(upscale_schedule[i-1], upscale_schedule[i]))
             # module.append(nn.TransformerEncoderLayer(d_model=1024, nhead=model_config.nhead, dropout=0))
-            module.append(AttnBlock(d_model=1024, nhead=model_config.nhead, dropout=0))
+            module.append(AttentionModule(embedding_dim=1024, nhead=model_config.nhead))
             # module.append(nn.Tanh())
             module.append(ResBlock(upscale_schedule[i]))
         
-        module.append(AttnBlock(d_model=1024, nhead=model_config.nhead, dropout=0))
+        module.append(AttentionModule(embedding_dim=1024, nhead=model_config.nhead))
         # module.append(nn.TransformerEncoderLayer(d_model=1024, nhead=model_config.nhead, dropout=0))
         module.append(DoubleConv(upscale_schedule[-1], upscale_schedule[-1], activation=False))
         self.backbone = nn.Sequential(*module)
