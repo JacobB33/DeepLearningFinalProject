@@ -36,7 +36,7 @@ class NSDDataset(Dataset):
         # self.process
 
         annotations = dataset_json["annotations"]
-        annotations = annotations[0: 100]
+        # annotations = annotations[0: 100]
         
 
         self.data_size = len(annotations)

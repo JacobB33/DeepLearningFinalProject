@@ -3,11 +3,11 @@ trainer_config:
   batch_size: 512
   data_loader_workers: 16
   grad_norm_clip: 1.0
-  snapshot_path: attention-6.pt
+  snapshot_path: replicate-attn-1.pt
   save_every: 15
   use_amp: False
   use_wandb: True
-  run_name: attention-6
+  run_name: replicate-attn-1
   use_lr_scheduler: True
 lr_scheduler_config:
   type: plateau
