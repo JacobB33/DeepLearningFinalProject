@@ -4,7 +4,7 @@ import torch.nn.functional as F
 import numpy as np
 import os
 from training.configs import ModelConfig
-from training.networks.building_blocks import ResBlock, DoubleConv, EncodeBS, A
+from training.networks.building_blocks import ResBlock, DoubleConv, EncodeBS, AttentionModule
 from training.networks.fancy_building_blocks import AttnBlock, ResnetBlock
 import math
 
