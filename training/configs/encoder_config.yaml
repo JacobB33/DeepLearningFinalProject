@@ -3,11 +3,11 @@ trainer_config:
   batch_size: 512
   data_loader_workers: 16
   grad_norm_clip: 1.0
-  snapshot_path: replicate-attn-1.pt
+  snapshot_path: overfit.pt
   save_every: 15
   use_amp: False
   use_wandb: True
-  run_name: replicate-attn-1
+  run_name: overfit
   use_lr_scheduler: True
 lr_scheduler_config:
   type: plateau
@@ -20,7 +20,7 @@ lr_scheduler_config:
 optimizer_config:
   optimizer: adam
   weight_decay: 0.0
-  learning_rate: 0.001
+  learning_rate: 0.0001
 data_config:
   train_percentage: 0.98
 model_config:
