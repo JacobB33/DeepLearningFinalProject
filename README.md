@@ -1,4 +1,4 @@
-# Diffusion from brain scans
+# Diffusion From Brain Scans
 To clone, first, git clone and  then run these commands in the repo:
 
 ```bash
