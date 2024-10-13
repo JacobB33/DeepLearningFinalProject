@@ -1,4 +1,5 @@
 # Diffusion From Brain Scans
+## [Our Final Report](https://drive.google.com/file/d/1MGu6FZDYPdRTJJNmV7ADSD9Ga6vFAfMp/view?usp=sharing)
 To clone, first, git clone and  then run these commands in the repo:
 
 ```bash
